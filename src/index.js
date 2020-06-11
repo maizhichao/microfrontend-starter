@@ -19,7 +19,12 @@ function Loading() {
 }
 
 const App = Loadable({
-  loader: () => import("./app"),
+  loader: () => import("./components/app"),
+  loading: Loading
+});
+
+const DispatchCenter = Loadable({
+  loader: () => import("./components/dispatch-center"),
   loading: Loading
 });
 
@@ -38,24 +43,15 @@ const routes = {
     onEnter: ({ params }, replace) => {
       const { lang, customerCode } = params;
       const customerId = decodeId(params.customerCode);
-
       return replace(
-        `/${lang}/${customerCode}/dispatch/board-view?customerId=${customerId}`
+        `/${lang}/${customerCode}/dispatch/center?customerId=${customerId}`
       );
     }
   },
   childRoutes: [
     {
-      path: "board-view",
-      component: BoardView
-    },
-    {
-      path: "edit-charts",
-      component: ChartsEdit
-    },
-    {
-      path: "edit-diagram",
-      component: DiagramEdit
+      path: "center",
+      component: DispatchCenter
     }
   ]
 };

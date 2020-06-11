@@ -1,10 +1,11 @@
 import axios from "axios";
 import { Modal } from "antd";
 import React from "react";
-import { exit } from "./utils";
 import { FormattedMessage } from "react-intl";
 import { commonMessages } from "@/shared/translations/common";
-const BASE_URL = window.Wolf.APIPath + "/api";
+import { exit } from "./utils";
+// const BASE_URL = window.Wolf.APIPath + "/api";
+const BASE_URL = "/";
 
 const getMessage = config => {
   return <FormattedMessage {...config}>{txt => txt}</FormattedMessage>;

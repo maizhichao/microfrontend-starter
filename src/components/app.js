@@ -7,7 +7,6 @@ import { commonMessages } from "@/shared/translations/common";
 import { injectIntl, intlShape } from "react-intl";
 import { auth, utils } from "@/shared";
 import Loading from "@/shared/controls/loading";
-import Main from "@/components/main";
 
 const { getUserId } = auth;
 
@@ -49,6 +48,7 @@ class App extends React.Component {
           }
           default: {
             throwUnknownError(intl);
+            return;
           }
         }
       }
@@ -56,19 +56,16 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const { intl, init } = this.props;
-    if (getUserId()) {
-      init();
-    } else {
-      throwUnknownError(intl);
-    }
+    const { init } = this.props;
+    init();
   }
 
   render() {
+    console.log("render app");
     if (!this.props.initialized) {
       return <Loading />;
     }
-    return <Main>{this.props.children}</Main>;
+    return this.props.children;
   }
 }
 
