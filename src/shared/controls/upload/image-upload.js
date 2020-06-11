@@ -4,27 +4,6 @@ import FontIcon from "@/shared/controls/font-icon";
 import BackgroundImage from "./background-image";
 import "./style.scss";
 import { Modal } from "antd";
-import { commonMessages } from "@/shared/translations/common";
-import { defineMessages } from "react-intl";
-
-const messages = defineMessages({
-  invalidFormat: {
-    id: "UploadImage.Failed.InvalidFormat",
-    defaultMessage: "上传失败，仅支持PNG、JPG、BMP"
-  },
-  maxSizeExceeded: {
-    id: "UploadImage.Failed.MaxSizeExceeded",
-    defaultMessage: "图片文件超过了2M的上限，请重新选择。"
-  },
-  emptyFile: {
-    id: "UploadImage.Failed.EmptyFile",
-    defaultMessage: "图片文件大小为0，请重新选择。"
-  },
-  corruptedFile: {
-    id: "UploadImage.Failed.CorruptedFile",
-    defaultMessage: "图片已损坏，请重新选择。"
-  }
-});
 
 const FILE_TYPE_IMAGE_REG = /(image\/png|image\/jpe?g|image\/bmp)/;
 const ENABLE_FILE_LIMIT = false;
@@ -44,13 +23,12 @@ export default class ImageUpload extends React.Component {
   }
 
   showUploadWarning(msg) {
-    const { intl } = this.props;
     Modal.warning({
       title: null,
       content: msg,
       centered: true,
       closable: true,
-      okText: intl.formatMessage(commonMessages.OK)
+      okText: "好的"
     });
   }
 
@@ -67,17 +45,17 @@ export default class ImageUpload extends React.Component {
   };
 
   _imageUpload = files => {
-    const { intl, imageSizeMax, imageDidChanged } = this.props;
+    const { imageSizeMax, imageDidChanged } = this.props;
     const self = this;
     if (files.length > 0) {
       let file = files[0];
       let warningMsg;
       if (!FILE_TYPE_IMAGE_REG.test(file.type)) {
-        warningMsg = intl.formatMessage(messages.invalidFormat);
+        warningMsg = "上传失败，仅支持PNG、JPG、BMP";
       } else if (ENABLE_FILE_LIMIT && file.size > imageSizeMax) {
-        warningMsg = intl.formatMessage(messages.maxSizeExceeded);
+        warningMsg = "图片文件超过了2M的上限，请重新选择。";
       } else if (file.size === 0) {
-        warningMsg = intl.formatMessage(messages.emptyFile);
+        warningMsg = "图片文件大小为0，请重新选择。";
       }
       if (warningMsg) {
         this.showUploadWarning(warningMsg);
@@ -89,7 +67,7 @@ export default class ImageUpload extends React.Component {
         var ret = this.result;
         var imgChecker = new Image();
         imgChecker.onerror = () => {
-          self.showUploadWarning(intl.formatMessage(messages.corruptedFile));
+          self.showUploadWarning("图片已损坏，请重新选择。");
         };
         imgChecker.onload = () => {
           let result = self.setImageUploadSource(ret);

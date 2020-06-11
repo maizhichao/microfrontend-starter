@@ -1,23 +1,16 @@
 import axios from "axios";
 import { Modal } from "antd";
-import React from "react";
-import { FormattedMessage } from "react-intl";
-import { commonMessages } from "@/shared/translations/common";
 import { exit } from "./utils";
-// const BASE_URL = window.Wolf.APIPath + "/api";
+// TODO: const BASE_URL = window.Wolf.APIPath + "/api";
 const BASE_URL = "/";
-
-const getMessage = config => {
-  return <FormattedMessage {...config}>{txt => txt}</FormattedMessage>;
-};
 
 function throwUnknownError() {
   if (process.env.NODE_ENV !== "production") {
     Modal.error({
-      title: getMessage(commonMessages.unknownErrorTitle),
-      content: getMessage(commonMessages.unknownError),
+      title: "操作失败",
+      content: "我们正在寻找原因。请稍后再试。",
       centered: true,
-      okText: getMessage(commonMessages.OK)
+      okText: "好的"
     });
   }
 }
@@ -62,8 +55,8 @@ service.interceptors.response.use(
       case 401: {
         Modal.warning({
           centered: true,
-          content: getMessage(commonMessages.loginError),
-          okText: getMessage(commonMessages.OK),
+          content: "当前用户已退出，请重新登录",
+          okText: "好的",
           autoFocusButton: "ok",
           onOk: () => {
             exit();

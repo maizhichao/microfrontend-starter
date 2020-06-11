@@ -5,10 +5,6 @@ import React from "react";
 import Loadable from "react-loadable";
 import { Provider } from "react-redux";
 import store from "./configure-store";
-import { IntlProvider, addLocaleData } from "react-intl";
-import zhLocale from "react-intl/locale-data/zh";
-
-addLocaleData([...zhLocale]);
 
 function decodeId(encoded) {
   return parseInt(encoded, 16);
@@ -32,11 +28,9 @@ const routes = {
   path: "dispatch",
   component: ({ children }) => {
     return (
-      <IntlProvider defaultLocale="zh-cn" onError={() => undefined}>
-        <Provider store={store}>
-          <App>{children}</App>
-        </Provider>
-      </IntlProvider>
+      <Provider store={store}>
+        <App>{children}</App>
+      </Provider>
     );
   },
   indexRoute: {
