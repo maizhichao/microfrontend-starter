@@ -30,7 +30,7 @@ class SignalRManager {
 
   async create() {
     const instance = new HubConnectionBuilder()
-      .withUrl(`${window.Wolf.APIPath}/hubs/realtimedata`, {
+      .withUrl(`${window.Leopard.APIPath}/hubs/realtimedata`, {
         skipNegotiation: true,
         transport: HttpTransportType.WebSockets
       })

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Modal } from "antd";
 import { exit } from "./utils";
-// TODO: const BASE_URL = window.Wolf.APIPath + "/api";
+// TODO: const BASE_URL = window.Leopard.APIPath + "/api";
 const BASE_URL = "/";
 
 function throwUnknownError() {

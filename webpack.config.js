@@ -23,7 +23,7 @@ const config = {
     publicPath: publicPath,
     filename: "[name].js",
     libraryTarget: "system",
-    library: "wolf"
+    library: "leopard"
   },
   externals: [
     /^@se\/(\w|\/)*$/,

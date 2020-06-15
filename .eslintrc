@@ -14,7 +14,8 @@
     "es6": true
   },
   "globals": {
-    "System": true
+    "System": true,
+    "AMap": true
   },
   "rules": {
     "react/wrap-multilines": 0,

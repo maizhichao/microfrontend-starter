@@ -1,4 +1,4 @@
-export const INITIALIZED = "wolf/main/INITIALIZED";
+export const INITIALIZED = "leopard/main/INITIALIZED";
 
 export function init() {
   return {

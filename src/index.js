@@ -1,5 +1,5 @@
 import { setPublicPath } from "systemjs-webpack-interop";
-setPublicPath("@se/module/wolf");
+setPublicPath("@se/module/leopard");
 
 import React from "react";
 import Loadable from "react-loadable";
@@ -24,30 +24,20 @@ const DispatchCenter = Loadable({
   loading: Loading
 });
 
+// import App from "./components/app";
+// import DispatchCenter from "./components/dispatch-center";
+
 const routes = {
-  path: "dispatch",
-  component: ({ children }) => {
+  path: "maintenance/dispatch",
+  component: () => {
     return (
       <Provider store={store}>
-        <App>{children}</App>
+        <App>
+          <DispatchCenter />
+        </App>
       </Provider>
     );
-  },
-  indexRoute: {
-    onEnter: ({ params }, replace) => {
-      const { lang, customerCode } = params;
-      const customerId = decodeId(params.customerCode);
-      return replace(
-        `/${lang}/${customerCode}/dispatch/center?customerId=${customerId}`
-      );
-    }
-  },
-  childRoutes: [
-    {
-      path: "center",
-      component: DispatchCenter
-    }
-  ]
+  }
 };
 
 export { routes };

@@ -1,4 +1,6 @@
 import { combineReducers } from "redux";
+import dispatchPanel from "./dispatch-panel";
+import dispatchLog from "./dispatch-log";
 
 import { INITIALIZED } from "@/actions/main";
 
@@ -18,5 +20,7 @@ function main(state = initialState, action) {
 }
 
 export default combineReducers({
-  main
+  main,
+  dispatchPanel,
+  dispatchLog
 });
