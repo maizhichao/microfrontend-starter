@@ -2,11 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Modal } from "antd";
-import { init } from "@/actions/main";
-import { auth, utils } from "@/shared";
+import { getAllUserPosition, getAllUsers } from "@/actions/main";
+import { utils } from "@/shared";
 import Loading from "@/shared/controls/loading";
-
-const { getUserId } = auth;
 
 function throwUnknownError() {
   if (process.env.NODE_ENV !== "production") {
@@ -26,7 +24,7 @@ class App extends React.Component {
     init: PropTypes.func
   };
 
-  componentWillReceiveProps(nextProps) {
+  UNSAGE_componentWillReceiveProps(nextProps) {
     const { globalError } = nextProps;
     if (this.props.globalError !== globalError) {
       if (globalError) {
@@ -53,8 +51,8 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const { init } = this.props;
-    init();
+    this.props.getAllUserPosition();
+    this.props.getAllUsers();
   }
 
   render() {
@@ -71,5 +69,6 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, {
-  init
+  getAllUserPosition,
+  getAllUsers
 })(App);

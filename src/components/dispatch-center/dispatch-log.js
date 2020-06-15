@@ -9,7 +9,7 @@ function LogList(props) {
   return (
     <Checkbox.Group style={{ width: "100%" }}>
       <Card>
-        <Card.Grid style={CARD_GRID_STYLE}>
+        <Card.Grid style={CARD_GRID_STYLE} hoverable={false}>
           <Card.Meta
             avatar={
               <div className="flex-center">

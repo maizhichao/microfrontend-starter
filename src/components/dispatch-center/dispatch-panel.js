@@ -1,50 +1,68 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Drawer, Button, Card, Avatar, Checkbox, PageHeader } from "antd";
-import { setVisible } from "@/actions/dispatch-panel";
+import { Drawer, Button, Card, Avatar, Checkbox, PageHeader, Spin } from "antd";
+import { setVisible, getSortedUsers } from "@/actions/dispatch-panel";
+import _ from "lodash";
 
 const CARD_GRID_STYLE = { width: "100%" };
 
+function UserDesc({ user, time, distance }) {
+  return (
+    <div>
+      <p>
+        路程: 预计{time}分钟到达 ({distance}km)
+      </p>
+      <p></p>状态: {user.status}
+    </div>
+  );
+}
+
 function UserList(props) {
+  const dispatch = useDispatch();
+  const users = useSelector(state => state.main.users);
+  const userPosition = useSelector(state => state.main.userPosition);
+  const currentSpot = useSelector(state => state.dispatchPanel.currentSpot);
+  const sortedUsers = useSelector(state => state.dispatchPanel.sortedUsers);
+  const loadingSortedUsers = useSelector(
+    state => state.dispatchPanel.loadingSortedUsers
+  );
+  console.log("UserList -> sortedUsers", sortedUsers);
+
+  useEffect(async () => {
+    dispatch(getSortedUsers(currentSpot, userPosition, users));
+    return () => {};
+  }, [currentSpot]);
+
+  if (loadingSortedUsers) {
+    return (
+      <div className="flex-center">
+        <Spin size="large" tip="计算派工人员列表..." />
+      </div>
+    );
+  }
+
   return (
     <Checkbox.Group style={{ width: "100%" }}>
       <Card>
-        <Card.Grid style={CARD_GRID_STYLE}>
-          <Card.Meta
-            avatar={
-              <div className="flex-center">
-                <Checkbox style={{ paddingRight: 10 }}></Checkbox>
-                <Avatar src="https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png" />
-              </div>
-            }
-            title={"title"}
-            description="Progresser XTech"
-          ></Card.Meta>
-        </Card.Grid>
-        <Card.Grid style={CARD_GRID_STYLE}>
-          <Card.Meta
-            avatar={
-              <div className="flex-center">
-                <Checkbox style={{ paddingRight: 10 }}></Checkbox>
-                <Avatar src="https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png" />
-              </div>
-            }
-            title={"title"}
-            description="Progresser XTech"
-          ></Card.Meta>
-        </Card.Grid>
-        <Card.Grid style={CARD_GRID_STYLE}>
-          <Card.Meta
-            avatar={
-              <div className="flex-center">
-                <Checkbox style={{ paddingRight: 10 }}></Checkbox>
-                <Avatar src="https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png" />
-              </div>
-            }
-            title={"title"}
-            description="Progresser XTech"
-          ></Card.Meta>
-        </Card.Grid>
+        {sortedUsers.map(([key, time, distance]) => {
+          const user = users[key];
+          return (
+            <Card.Grid style={CARD_GRID_STYLE} hoverable={false}>
+              <Card.Meta
+                avatar={
+                  <div className="flex-center">
+                    <Checkbox style={{ paddingRight: 10 }}></Checkbox>
+                    <Avatar src="https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png" />
+                  </div>
+                }
+                title={user.name}
+                description={
+                  <UserDesc user={user} distance={distance} time={time} />
+                }
+              ></Card.Meta>
+            </Card.Grid>
+          );
+        })}
       </Card>
     </Checkbox.Group>
   );
@@ -108,7 +126,6 @@ export default function DispatchPanel(props) {
   const onClose = () => {
     dispatch(setVisible(false));
   };
-
   return (
     <Drawer
       width={340}
