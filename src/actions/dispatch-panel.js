@@ -38,8 +38,13 @@ async function getSortedItems(currentSpot, userPosition, users) {
           });
         });
       });
-      const allRes = await Promise.all(promises);
-      resolve(_.sortBy(allRes, item => item[1]));
+      try {
+        const allRes = await Promise.all(promises);
+        resolve(_.sortBy(allRes, item => item[1]));
+      } catch (e) {
+        console.error("Failed to load map routes: " + e);
+        resolve([]);
+      }
     });
   });
 }

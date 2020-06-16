@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import ReactDOM from "react-dom";
 import { mapLoader } from "@se/pop";
 import { useSelector, useDispatch } from "react-redux";
 import { Spin } from "antd";
@@ -7,9 +6,13 @@ import "./styles.scss";
 import { setCurrentSpot } from "@/actions/dispatch-panel";
 import DispatchPanel from "./dispatch-panel";
 import DispatchLog from "./dispatch-log";
-import { Spot, popupContainer } from "./spot";
+import { generateSpots } from "./spot";
 
 let dispatchMap = null;
+
+export function getDispatchMap() {
+  return dispatchMap;
+}
 
 function LoadingMap() {
   return (
@@ -41,20 +44,10 @@ async function loadMap(dispatch, users, userPosition) {
     console.log([e.lnglat.getLng(), e.lnglat.getLat()]);
   });
   const position = [116.440048, 39.917126];
-  const marker = new AMap.Marker({
-    position: position,
-    map: dispatchMap,
-    content: popupContainer
-  });
 
-  ReactDOM.render(
-    <Spot
-      title={"新建建筑"}
-      message={"高级 15:22 电压严重过低 (未解除)"}
-      onConfirm={() => dispatch(setCurrentSpot(position))}
-    />,
-    popupContainer
-  );
+  const onConfirm = () => dispatch(setCurrentSpot(position));
+
+  generateSpots(position, onConfirm, dispatchMap);
 
   generateMarkers(users, userPosition);
 }
@@ -73,11 +66,16 @@ export default function DispatchCenter(props) {
     };
   });
 
+  const audioSrc = `${process.env.PUBLIC_PATH}public/alarm-notice.mp3`;
+
   return (
-    <div id="_dispatch_map" style={{ width: "100%", height: "100%" }}>
-      {!mapLoader.mapLoaded() && <LoadingMap />}
+    <>
+      <audio src={audioSrc} autoPlay loop />
+      <div id="_dispatch_map" style={{ width: "100%", height: "100%" }}>
+        {!mapLoader.mapLoaded() && <LoadingMap />}
+      </div>
       <DispatchLog />
       <DispatchPanel />
-    </div>
+    </>
   );
 }

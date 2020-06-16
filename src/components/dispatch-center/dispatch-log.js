@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { Drawer, Icon, Card, Avatar, Checkbox } from "antd";
-import { setVisible } from "@/actions/dispatch-log";
+import { Drawer, Card, Avatar, Checkbox } from "antd";
 
 const CARD_GRID_STYLE = { width: "100%" };
 
@@ -63,14 +61,10 @@ function Arrow(props) {
 }
 
 export default function DispatchLog(props) {
-  const logVisible = useSelector(state => state.dispatchLog.visible);
-  const dispatch = useDispatch();
-  if (!logVisible) {
+  const [visible, setVisible] = useState(false);
+  if (!visible) {
     return (
-      <div
-        className="dispatch-log-anchor"
-        onClick={() => dispatch(setVisible(true))}
-      >
+      <div className="dispatch-log-anchor" onClick={() => setVisible(true)}>
         24小时抢修记录
       </div>
     );
@@ -81,12 +75,12 @@ export default function DispatchLog(props) {
       width={340}
       placement="left"
       title={<Title dispatchCount={10} />}
-      visible={logVisible}
+      visible={true}
       mask={false}
       closable={false}
       bodyStyle={{ padding: 0 }}
     >
-      <Arrow onClick={() => dispatch(setVisible(false))} />
+      <Arrow onClick={() => setVisible(false)} />
       <LogList />
     </Drawer>
   );

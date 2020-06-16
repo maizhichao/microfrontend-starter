@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Popconfirm } from "antd";
+import ReactDOM from "react-dom";
 import "./styles.scss";
 
 function makeTitle(title, message) {
@@ -19,7 +20,7 @@ function Spot(props) {
   return (
     <Popconfirm
       title={title}
-      getPopupContainer={() => popupContainer}
+      getPopupContainer={() => props.popupContainer}
       okText="派工"
       cancelText="忽略报警"
       onConfirm={props.onConfirm}
@@ -36,7 +37,29 @@ function Spot(props) {
   );
 }
 
-const popupContainer = document.createElement("div");
-popupContainer.className = "spot-popup-container";
+function getPopupContainer() {
+  const popupContainer = document.createElement("div");
+  popupContainer.className = "spot-popup-container";
+  return popupContainer;
+}
 
-export { Spot, popupContainer };
+function generateSpots(position, onConfirm, dispatchMap) {
+  const popupContainer = getPopupContainer();
+  const marker = new AMap.Marker({
+    position: position,
+    map: dispatchMap,
+    content: popupContainer
+  });
+
+  ReactDOM.render(
+    <Spot
+      title={"新建建筑"}
+      message={"高级 15:22 电压严重过低 (未解除)"}
+      onConfirm={onConfirm}
+      popupContainer={popupContainer}
+    />,
+    popupContainer
+  );
+}
+
+export { Spot, getPopupContainer, generateSpots };

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Drawer, Button, Card, Avatar, Checkbox, PageHeader, Spin } from "antd";
 import { setVisible, getSortedUsers } from "@/actions/dispatch-panel";
 import _ from "lodash";
+import { getDispatchMap } from "./index";
 
 const CARD_GRID_STYLE = { width: "100%" };
 
@@ -17,6 +18,51 @@ function UserDesc({ user, time, distance }) {
   );
 }
 
+function parseRouteToPath(route) {
+  const path = [];
+  for (let i = 0, l = route.steps.length; i < l; i++) {
+    const step = route.steps[i];
+    for (let j = 0, n = step.path.length; j < n; j++) {
+      path.push(step.path[j]);
+    }
+  }
+  return path;
+}
+
+function removeRoute(routeLine) {
+  const dispatchMap = getDispatchMap();
+  dispatchMap.remove(routeLine);
+}
+
+function drawRoute(startPosition, currentSpot) {
+  const dispatchMap = getDispatchMap();
+  return new Promise((resolve, reject) => {
+    AMap.plugin("AMap.Driving", async () => {
+      const driving = new AMap.Driving({
+        policy: AMap.DrivingPolicy.LEAST_TIME
+      });
+      driving.search(startPosition, currentSpot, function (status, result) {
+        if (status === "complete") {
+          if (result.routes && result.routes.length) {
+            const path = parseRouteToPath(result.routes[0]);
+            const routeLine = new AMap.Polyline({
+              path: path,
+              isOutline: true,
+              outlineColor: "#ffeeee",
+              borderWeight: 2,
+              strokeWeight: 5,
+              strokeColor: "#0091ff",
+              lineJoin: "round"
+            });
+            routeLine.setMap(dispatchMap);
+            resolve(routeLine);
+          }
+        }
+      });
+    });
+  });
+}
+
 function UserList(props) {
   const dispatch = useDispatch();
   const users = useSelector(state => state.main.users);
@@ -26,12 +72,15 @@ function UserList(props) {
   const loadingSortedUsers = useSelector(
     state => state.dispatchPanel.loadingSortedUsers
   );
-  console.log("UserList -> sortedUsers", sortedUsers);
 
-  useEffect(async () => {
+  useEffect(() => {
     dispatch(getSortedUsers(currentSpot, userPosition, users));
     return () => {};
   }, [currentSpot]);
+
+  if (!props.display) {
+    return null;
+  }
 
   if (loadingSortedUsers) {
     return (
@@ -41,34 +90,49 @@ function UserList(props) {
     );
   }
 
+  const onChange = async (key, checked) => {
+    if (checked) {
+      const routeLine = await drawRoute(userPosition[key], currentSpot);
+      props.setRouteLines({ ...props.routeLines, [key]: routeLine });
+    } else {
+      removeRoute(props.routeLines[key]);
+      props.setRouteLines({ ...props.routeLines, [key]: null });
+    }
+  };
+
   return (
-    <Checkbox.Group style={{ width: "100%" }}>
-      <Card>
-        {sortedUsers.map(([key, time, distance]) => {
-          const user = users[key];
-          return (
-            <Card.Grid style={CARD_GRID_STYLE} hoverable={false}>
-              <Card.Meta
-                avatar={
-                  <div className="flex-center">
-                    <Checkbox style={{ paddingRight: 10 }}></Checkbox>
-                    <Avatar src="https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png" />
-                  </div>
-                }
-                title={user.name}
-                description={
-                  <UserDesc user={user} distance={distance} time={time} />
-                }
-              ></Card.Meta>
-            </Card.Grid>
-          );
-        })}
-      </Card>
-    </Checkbox.Group>
+    <Card>
+      {sortedUsers.map(([key, time, distance]) => {
+        const user = users[key];
+        return (
+          <Card.Grid style={CARD_GRID_STYLE} hoverable={false}>
+            <Card.Meta
+              avatar={
+                <div className="flex-center">
+                  <Checkbox
+                    checked={!!props.routeLines[key]}
+                    onChange={e => onChange(key, e.target.checked)}
+                    style={{ paddingRight: 10 }}
+                  ></Checkbox>
+                  <Avatar src="https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png" />
+                </div>
+              }
+              title={user.name}
+              description={
+                <UserDesc user={user} distance={distance} time={time} />
+              }
+            ></Card.Meta>
+          </Card.Grid>
+        );
+      })}
+    </Card>
   );
 }
 
 function TicketSetting(props) {
+  if (!props.display) {
+    return null;
+  }
   return <div>TODO</div>;
 }
 
@@ -85,7 +149,12 @@ function Footer(props) {
 
   if (props.page === 1) {
     buttons.push(
-      <Button key="footer-next" onClick={() => props.setPage(2)} type="primary">
+      <Button
+        key="footer-next"
+        disabled={props.nextStepDisabled}
+        onClick={() => props.setPage(2)}
+        type="primary"
+      >
         下一步
       </Button>
     );
@@ -120,6 +189,7 @@ function Title(props) {
 }
 
 export default function DispatchPanel(props) {
+  const [routeLines, setRouteLines] = useState({});
   const panelVisible = useSelector(state => state.dispatchPanel.visible);
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
@@ -137,11 +207,17 @@ export default function DispatchPanel(props) {
       mask={false}
       bodyStyle={{ padding: 0 }}
     >
-      {page === 1 ? <UserList /> : <TicketSetting />}
+      <UserList
+        routeLines={routeLines}
+        setRouteLines={setRouteLines}
+        display={page === 1}
+      />
+      <TicketSetting display={page === 2} />
       <Footer
         page={page}
         onClose={onClose}
         setPage={setPage}
+        nextStepDisabled={_.isEmpty(routeLines)}
         dispatch={props.dispatch}
       />
     </Drawer>

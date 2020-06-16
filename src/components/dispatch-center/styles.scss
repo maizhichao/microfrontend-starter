@@ -40,16 +40,17 @@
   border-radius: 0px 4px 4px 0px;
   top: 40%;
   left: 0px;
-  z-index: 2;
+  z-index: 3;
   text-align: center;
   color: white;
   background-color: $se-primary;
+  opacity: 0.8;
   width: 24px;
   margin: auto;
   height: 140px;
   &:hover {
     cursor: pointer;
-    opacity: 0.8;
+    opacity: 1;
   }
 }
 
