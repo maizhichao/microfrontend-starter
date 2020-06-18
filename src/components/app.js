@@ -1,10 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { Modal } from "antd";
+import { Modal, Spin } from "antd";
 import { getAllUserPosition, getAllUsers } from "@/actions/main";
-import { utils } from "@/shared";
+import * as utils from "@/shared/utils";
 import Loading from "@/shared/controls/loading";
+import { mapLoader } from "@se/pop";
 
 function throwUnknownError() {
   if (process.env.NODE_ENV !== "production") {
@@ -15,6 +16,14 @@ function throwUnknownError() {
       okText: "好的"
     });
   }
+}
+
+function LoadingMap() {
+  return (
+    <div className="flex-center">
+      <Spin size="large" tip="地图加载中..." />
+    </div>
+  );
 }
 
 class App extends React.Component {
@@ -53,11 +62,15 @@ class App extends React.Component {
   componentDidMount() {
     this.props.getAllUserPosition();
     this.props.getAllUsers();
+    mapLoader.load();
   }
 
   render() {
     if (!this.props.initialized) {
       return <Loading />;
+    }
+    if (!mapLoader.mapLoaded()) {
+      return <LoadingMap />;
     }
     return this.props.children;
   }

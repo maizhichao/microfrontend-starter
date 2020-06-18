@@ -18,34 +18,33 @@ export function setCurrentSpot(position) {
 
 async function getSortedItems(currentSpot, userPosition, users) {
   return new Promise((resolve, reject) => {
-    AMap.plugin("AMap.Driving", async () => {
-      const driving = new AMap.Driving({
-        policy: AMap.DrivingPolicy.LEAST_TIME
-      });
-      const promises = Object.entries(userPosition).map(([key, p]) => {
-        return new Promise((rs, rj) => {
-          driving.search(p, currentSpot, (status, result) => {
-            if (status === "complete") {
-              const route = result.routes[0];
-              rs([
-                key,
-                Math.round(route.time / 60),
-                Math.round(route.distance / 1000)
-              ]);
-            } else {
-              rj("Failed to load map routes");
-            }
-          });
+    const driving = new AMap.Driving({
+      policy: AMap.DrivingPolicy.LEAST_TIME
+    });
+    const promises = Object.entries(userPosition).map(([key, p]) => {
+      return new Promise((rs, rj) => {
+        driving.search(p, currentSpot, (status, result) => {
+          if (status === "complete") {
+            const route = result.routes[0];
+            rs([
+              key,
+              Math.round(route.time / 60),
+              Math.round(route.distance / 1000)
+            ]);
+          } else {
+            rj("Failed to load map routes");
+          }
         });
       });
-      try {
-        const allRes = await Promise.all(promises);
-        resolve(_.sortBy(allRes, item => item[1]));
-      } catch (e) {
-        console.error("Failed to load map routes: " + e);
-        resolve([]);
-      }
     });
+    try {
+      Promise.all(promises).then(res => {
+        resolve(_.sortBy(res, item => item[1]));
+      });
+    } catch (e) {
+      console.error("Failed to load map routes: " + e);
+      resolve([]);
+    }
   });
 }
 

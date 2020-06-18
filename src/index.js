@@ -24,16 +24,14 @@ const DispatchCenter = Loadable({
   loading: Loading
 });
 
-// import App from "./components/app";
-// import DispatchCenter from "./components/dispatch-center";
-
 const routes = {
   path: "maintenance/dispatch",
-  component: () => {
+  component: ({ params }) => {
+    const customerId = decodeId(params.customerCode);
     return (
       <Provider store={store}>
         <App>
-          <DispatchCenter />
+          <DispatchCenter customerId={customerId} />
         </App>
       </Provider>
     );

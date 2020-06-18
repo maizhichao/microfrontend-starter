@@ -1,0 +1,42 @@
+.amap-zoom-touch {
+  &-plus,
+  &-minus {
+    &:hover {
+      background-color: #f0fff0;
+    }
+  }
+}
+
+.map-control {
+  position: absolute;
+  text-align: center;
+  right: 14px;
+  z-index: 500;
+  width: 35px;
+  background-color: white;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  box-shadow: 1px 1px 10px 0 #ccc;
+
+  > div {
+    margin: auto;
+    line-height: 43px;
+    font-family: verdana;
+    text-align: center;
+    color: #666;
+    height: 100%;
+    cursor: pointer;
+    &:hover {
+      background-color: #f0fff0;
+    }
+  }
+
+  &.fit-view {
+    bottom: 130px;
+  }
+
+  &.ignore-alarm {
+    bottom: 180px;
+  }
+}

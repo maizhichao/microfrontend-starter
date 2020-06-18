@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Drawer, Button, Card, Avatar, Checkbox, PageHeader, Spin } from "antd";
 import { setVisible, getSortedUsers } from "@/actions/dispatch-panel";
 import _ from "lodash";
-import { getDispatchMap } from "./index";
+import * as amap from "@/amap";
 
 const CARD_GRID_STYLE = { width: "100%" };
 
@@ -16,51 +16,6 @@ function UserDesc({ user, time, distance }) {
       <p></p>状态: {user.status}
     </div>
   );
-}
-
-function parseRouteToPath(route) {
-  const path = [];
-  for (let i = 0, l = route.steps.length; i < l; i++) {
-    const step = route.steps[i];
-    for (let j = 0, n = step.path.length; j < n; j++) {
-      path.push(step.path[j]);
-    }
-  }
-  return path;
-}
-
-function removeRoute(routeLine) {
-  const dispatchMap = getDispatchMap();
-  dispatchMap.remove(routeLine);
-}
-
-function drawRoute(startPosition, currentSpot) {
-  const dispatchMap = getDispatchMap();
-  return new Promise((resolve, reject) => {
-    AMap.plugin("AMap.Driving", async () => {
-      const driving = new AMap.Driving({
-        policy: AMap.DrivingPolicy.LEAST_TIME
-      });
-      driving.search(startPosition, currentSpot, function (status, result) {
-        if (status === "complete") {
-          if (result.routes && result.routes.length) {
-            const path = parseRouteToPath(result.routes[0]);
-            const routeLine = new AMap.Polyline({
-              path: path,
-              isOutline: true,
-              outlineColor: "#ffeeee",
-              borderWeight: 2,
-              strokeWeight: 5,
-              strokeColor: "#0091ff",
-              lineJoin: "round"
-            });
-            routeLine.setMap(dispatchMap);
-            resolve(routeLine);
-          }
-        }
-      });
-    });
-  });
 }
 
 function UserList(props) {
@@ -92,10 +47,10 @@ function UserList(props) {
 
   const onChange = async (key, checked) => {
     if (checked) {
-      const routeLine = await drawRoute(userPosition[key], currentSpot);
+      const routeLine = await amap.drawRoute(userPosition[key], currentSpot);
       props.setRouteLines({ ...props.routeLines, [key]: routeLine });
     } else {
-      removeRoute(props.routeLines[key]);
+      amap.removeItem(props.routeLines[key]);
       props.setRouteLines({ ...props.routeLines, [key]: null });
     }
   };

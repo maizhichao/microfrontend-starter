@@ -8,13 +8,20 @@ import {
   GET_ALL_POSITION_FAILURE,
   GET_ALL_USERS_REQUEST,
   GET_ALL_USERS_SUCCESS,
-  GET_ALL_USERS_FAILURE
+  GET_ALL_USERS_FAILURE,
+  GET_ALL_SPOTS_REQUEST,
+  GET_ALL_SPOTS_SUCCESS,
+  GET_ALL_SPOTS_FAILURE,
+  SPOT_SELECTED
 } from "@/actions/main";
 
 const initialState = {
   initialized: false,
   userPosition: null,
-  users: null
+  users: null,
+  loadingSpots: true,
+  spots: [],
+  selectedSpot: null
 };
 
 function main(state = initialState, action) {
@@ -41,6 +48,28 @@ function main(state = initialState, action) {
       };
     case GET_ALL_USERS_FAILURE:
       return state;
+    case GET_ALL_SPOTS_REQUEST:
+      return {
+        ...state,
+        loadingSpots: true,
+        spots: []
+      };
+    case GET_ALL_SPOTS_SUCCESS:
+      return {
+        ...state,
+        loadingSpots: false,
+        spots: action.payload
+      };
+    case GET_ALL_SPOTS_FAILURE:
+      return {
+        ...state,
+        loadingSpots: false
+      };
+    case SPOT_SELECTED:
+      return {
+        ...state,
+        selectedSpot: action.payload
+      };
     default:
       return state;
   }
