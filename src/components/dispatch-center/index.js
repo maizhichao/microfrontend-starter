@@ -6,12 +6,15 @@ import DispatchPanel from "./dispatch-panel";
 import DispatchLog from "./dispatch-log";
 import { FitView, IgnoreAlarm } from "./map-controls";
 import SearchSpot from "./map-controls/search-spot";
-import { initializeMap, generateMarkers, generateSpots } from "@/amap";
-
-let dispatchMap = null;
+import {
+  initializeMap,
+  destroyMap,
+  generateMarkers,
+  generateSpots
+} from "@/amap";
 
 async function init(dispatch, users, userPosition) {
-  dispatchMap = initializeMap([116.43, 39.92]);
+  const dispatchMap = initializeMap([116.43, 39.92]);
 
   const position = [116.440048, 39.917126];
 
@@ -31,9 +34,7 @@ export default function DispatchCenter(props) {
   useEffect(() => {
     init(dispatch, users, userPosition);
     return () => {
-      if (dispatchMap) {
-        dispatchMap.destroy();
-      }
+      destroyMap();
     };
   }, []);
 
