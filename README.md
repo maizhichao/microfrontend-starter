@@ -1,3 +1,1 @@
-# Leopard-UI
-
-# 20200611
+# A micro-frontend starter project
